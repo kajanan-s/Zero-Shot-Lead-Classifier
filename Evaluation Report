@@ -1,0 +1,56 @@
+Zero-Shot Lead Source Classifier Evaluation Report
+
+This report uses only what the code produced: the CSV file, the confusion matrix, the results text file, and the script itself.
+
+Overall Accuracy
+
+The zero‑shot classifier got 73 out of 100 texts correct. That is 73 percent accuracy. The baseline that always guesses the most common label (Email Campaign) gets only 20 percent right. So the model is 53 percentage points better than just guessing.
+
+Per Class Metrics from the Confusion Matrix
+
+Here is the confusion matrix from your run. Rows are true labels. Columns are predicted labels.
+
+                Facebook Ad   Google Search   Referral   Email Campaign   Event/Webinar
+Facebook Ad          13            0            7            0                0
+Google Search         0           20            0            0                0
+Referral              0            0           20            0                0
+Email Campaign        0            0           11            9                0
+Event/Webinar         0            0            9            0               11
+
+From those numbers we get precision, recall, and F1 score for each class.
+
+Facebook Ad: precision 1.00, recall 0.65, F1 0.79
+Google Search: precision 1.00, recall 1.00, F1 1.00
+Referral: precision 0.43, recall 1.00, F1 0.60
+Email Campaign: precision 1.00, recall 0.45, F1 0.62
+Event/Webinar: precision 1.00, recall 0.55, F1 0.71
+
+All five classes have 20 texts each.
+
+Discussion of Results
+
+The model is perfect at spotting Google Search leads. It never missed one and never called anything else Google Search. That makes sense because phrases like “found you on Google” and “top search result” are very clear.
+
+The model is also very careful when it predicts Facebook Ad, Email Campaign, or Event/Webinar. When it says one of those, it is almost always correct. But it does not catch all of them. For Facebook Ad it only caught 13 out of 20. The other 7 were called Referral. Email Campaign caught only 9 out of 20. The other 11 were called Referral. Event/Webinar caught 11 out of 20. The other 9 were called Referral.
+
+So the big problem is that the model overuses Referral. It sends 27 texts from other classes into the Referral bucket. That is why Referral has low precision (0.43). It gets many false positives.
+
+Why does this happen? The code uses a hypothesis template that says “This lead came from {}”. The model might think any message that mentions a person (like “my colleague” or “your name came up”) is a referral, even when the message is really about an ad or an event.
+
+Limitations
+
+The dataset is perfectly balanced with 20 texts per category. Real small business leads are never that balanced. So the numbers might change with real data.
+
+The script needs a NewsAPI key and internet. If the API fails, it uses fake topics like “small business growth strategies”. Those fake texts are not real lead messages.
+
+The model is big, about 1.6 GB. It needs a decent computer to run.
+
+It only works for English. No other languages.
+
+The hypothesis template is hardcoded. Trying a different template might give better results but the code does not test that.
+
+The model always picks a label, even when it is not confident. There is no way to say “I am not sure”.
+
+Conclusion
+
+The zero‑shot lead classifier works. It gets 73 percent accuracy with no training data. A small business owner could change the labels at runtime using the interactive mode and get useful predictions. The main issue is the referral bias. Fixing the hypothesis template would probably help.
